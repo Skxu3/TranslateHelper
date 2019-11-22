@@ -7,4 +7,18 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'app';
+
+  processText() {
+
+  }
+
+  kanjiToHiragana() {
+
+  }
+
+  hiraganaToRomaji() {
+  	
+  }
+
+
 }
