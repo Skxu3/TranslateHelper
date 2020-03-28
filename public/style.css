@@ -1,0 +1,56 @@
+#content {
+	margin: 0 auto;
+	text-align: center;
+}
+.part {
+	padding: 5%;
+}
+.font-bold .bold {
+	font-weight: bold;
+}
+.italic {
+	font-style: italic;
+}
+.selected {
+	background-color: yellow;
+}
+.select {
+	border: none;
+	color: brown;
+	text-decoration: none;
+	background-color: transparent;
+	margin-bottom: 5%;
+	font-size: 20px;
+}
+.select:hover {
+	color: red;
+}
+.select:disabled {
+	text-decoration: line-through;
+}
+.control {
+	border: none;
+	color: brown;
+	text-decoration: none;
+	background-color: transparent;
+	border: 2px red solid;
+	border-radius: 10px;
+}
+.control:hover {
+	background-color: yellow;
+}
+.display {
+	margin: 5%;
+}
+textarea{
+	width: 85%;
+	margin: 0 auto;
+}
+iframe {
+	width: 80%;
+	margin: 0 auto;
+}
+table#textGlossingTable {
+	margin-top: 9%;
+	background-color: #FEF9E7;
+}
