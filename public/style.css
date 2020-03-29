@@ -1,6 +1,8 @@
 #content {
 	margin: 0 auto;
 	text-align: center;
+	overflow-y: hidden;
+	height: 100%;
 }
 .part {
 	padding: 5%;
@@ -50,7 +52,50 @@ iframe {
 	width: 80%;
 	margin: 0 auto;
 }
-table#textGlossingTable {
-	margin-top: 9%;
-	background-color: #FEF9E7;
+
+table {
+  width: 100%;
+}
+
+table, td {
+  border-collapse: collapse;
+  border: 1px solid #000;
+}
+
+thead {
+  display: table;
+  width: 100%;
+  background-color: #FEF9E7;
+}
+
+tbody {
+  display: block;
+  max-height: 200px;
+  overflow-y: scroll;
+}
+
+th, td.col {
+  width: 18%;
+}
+
+th, td.col1 {
+  width: 14%;
+}
+
+ th, td.col2 {
+  width: 48%;
+}
+
+tr {
+  display: table;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+td {
+  text-align: center;
+  border-bottom: none;
+  border-left: none;
+  padding: 1%;
+  font-size: 16px;
 }

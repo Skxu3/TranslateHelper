@@ -12,7 +12,7 @@
  </head>
 
  <body>
-   <div class="container-fluid text-center" id='content'>
+   <div class="container text-center" id='content'>
     <a href="/">Home</a>
     <div class="row">
       <div class="left col-sm-6">
@@ -32,26 +32,32 @@
     
     <div class="row">
       <h3>Text Glossing</h3>
-      <div name="text" id='text-glossing' class="display" rows='10' cols='50'>
-        <!-- <%= textGlossing %> -->
-        <!-- <% if (textGlossing != "") { %>
+      <div name="text" id='text-glossing'>
+        <% if (textGlossing.length > 0) { %>
           <table id="textGlossingTable">
               <thead>
                   <tr>
-                      <td>Word</td>
-                      <td>Hiragana</td>
-                      <td>Part of Speech</td>
-                      <td>Meaning</td>
-                      <td>
-                          <input type="button" class="btn btn-success" id="addrow" value="Add Row" />
-                      </td>
+                      <td class='col'>Word</td>
+                      <td class='col'>Hiragana</td>
+                      <td class='col'>Part of Speech</td>
+                      <td class='col2'>Meaning</td>
                   </tr>
               </thead>
               <tbody>
-                <%- textRows %>
+                <% textGlossing.forEach(function(row) { %>
+                  <% row.defs.forEach(function(def) { %>
+                    <tr>
+                      <td class='col'><%= row.word %></td>
+                      <td class='col'><%= row.hiragana %></td>
+                      <td class='col'><%= def.pos %></td>
+                      <td class='col2'><%= def.definition %></td>
+                    </tr>
+                  <% }); %>
+                <% }); %>
               </tbody>
           </table>
-        <% } %> -->
+        <% } %>
+
       </div>
     </div>
 

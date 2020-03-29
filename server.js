@@ -12,14 +12,14 @@ server.get('/', function(req, res) {
     res.render('index', {
     	textAreaInput: "",
     	romaji: "",
-    	textGlossing: ""
+    	textGlossing: []
     });
 });
 
 server.post('/process', function(req, res) {
     var rawText = req.body.rawText;
 	var wwwjdicUrl = 'http://nihongo.monash.edu/cgi-bin/wwwjdic?EZIH' + encodeURIComponent(rawText);
-    var meanings = "";
+    var glossing = [];
     request({
         method: 'GET',
         url: wwwjdicUrl
@@ -27,26 +27,19 @@ server.post('/process', function(req, res) {
         if (error) return console.error(error);
         
         let $ = cheerio.load(body);
-
+        let allWords = [];
         $('li').each(function(i, elem) {
-            console.log($(this).text());
-            // var newRow = $("<tr>");
-            // var cols = "";
-
-            let parts = translationRowToParts($(this).text());
-
-            // cols += '<td class="col-sm-3">' + word + '"</td>';
-            // cols += '<td class="col-sm-1"><input type="button" class="delete-button btn btn-md btn-danger"  value="Delete"></td>';
-            // newRow.append(cols);
-
-            // meanings += newRow + "</tr>";
-            //meanings += $(this).text() + "\n";
+            let rowParts = translationRowToParts($(this).text());
+            if (!allWords.includes(rowParts['word'])) {
+                glossing.push(rowParts);
+                allWords.push(rowParts['word']);
+            }
         });
 
         res.render('index', {
             textAreaInput: rawText,
             romaji: rawText,
-            textGlossing: meanings
+            textGlossing: glossing
         });
 
     });
@@ -60,7 +53,7 @@ server.post('/process', function(req, res) {
  * @return [word, hiragana, pos1, def1, pos2, def2...]
  */
 function translationRowToParts(translationRow){
-    let parts = []; 
+    let parts = {}; 
     if (translationRow.includes("Possible inflected")) {
         idxEndOfMsg = translationRow.indexOf(")");
         translationRow = translationRow.substring(idxEndOfMsg + 1, translationRow.length); 
@@ -73,7 +66,7 @@ function translationRowToParts(translationRow){
     idxStartOfHiragana = translationRow.indexOf("【");
     idxStartOfPOS = translationRow.indexOf("(");
     var idxEndOfWord = idxStartOfHiragana > 0 ? idxStartOfHiragana : idxStartOfPOS;
-    parts.push(translationRow.substring(0, idxEndOfWord).trim()); // word
+    parts['word'] = translationRow.substring(0, idxEndOfWord).trim(); // word
     translationRow = translationRow.substring(idxEndOfWord, translationRow.length); 
 
     let hiragana = "";
@@ -82,22 +75,29 @@ function translationRowToParts(translationRow){
         // regex won't match "[Partial Match!]" bc different bracket
         hiragana = hiraganaMatcher.pop(); 
     }
-    parts.push(hiragana);
+    parts['hiragana'] = hiragana;
 
     let posMatcher = translationRow.match(/\(((adj|adv|n|aux)[-[a-z]*]*|v|conj|exp|id|int|pn|prt|pref|suf|(v[\d|a-z]+[-[a-z]*))\)/g);
+    let defs = [];
     if (posMatcher != null && posMatcher.length > 0) {
-      let i = posMatcher.length - 1;
-      let defs = [];
-      for (i; i >= 0; i--) {
+      for (var i = posMatcher.length - 1; i >= 0; i--) {
+        let def = {};
         let pos = posMatcher[i];
+
         idxStartOfPOS = translationRow.indexOf(pos);
-        defs.unshift(translationRow.substring(idxStartOfPOS + pos.length, translationRow.length).trim()); // definition        
-        defs.unshift(translationRow.substring(idxStartOfPOS, idxStartOfPOS + pos.length).replace(/[()]/g, '')); // pos  
+        def['pos'] = translationRow.substring(idxStartOfPOS, idxStartOfPOS + pos.length).replace(/[()]/g, ''); // pos  
+        
+        definition = translationRow.substring(idxStartOfPOS + pos.length, translationRow.length).trim();
+        if ((definition.match(/;/g)||[]).length == 1) {
+            definition = definition.replace(';', '');
+        }
+        def['definition'] = definition; // definition
+
         translationRow = translationRow.substring(0, idxStartOfPOS);
+        defs.push(def);
       }
-      parts = parts.concat(defs);
     }
-    console.log(parts);
+    parts['defs'] = defs.reverse();
     return parts;
 }
 
