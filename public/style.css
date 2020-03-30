@@ -44,6 +44,10 @@
 .display {
 	margin: 5%;
 }
+.display#romaji {
+	white-space: pre;
+}
+
 textarea{
 	width: 85%;
 	margin: 0 auto;

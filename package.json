@@ -17,9 +17,15 @@
   },
   "homepage": "https://github.com/Starshine3/TranslateHelper#readme",
   "dependencies": {
+    "axios": "^0.19.2",
     "cheerio": "^1.0.0-rc.3",
-    "ejs": "^1.0.0",
+    "ejs": "^2.5.5",
     "express": "^4.17.1",
-    "request": "^2.69.0"
+    "install": "^0.13.0",
+    "kuroshiro": "^1.1.2",
+    "kuroshiro-analyzer-kuromoji": "^1.1.0",
+    "npm": "^6.14.4",
+    "request": "^2.88.2",
+    "wanakana": "^4.0.2"
   }
 }

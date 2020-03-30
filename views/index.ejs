@@ -6,8 +6,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://unpkg.com/wanakana"></script>
-  
   <link rel="stylesheet" type="text/css" href="style.css">
  </head>
 
@@ -24,9 +22,7 @@
       </div>
       <div class="right col-sm-6">
         <h3>Romaji</h3>
-        <div name="text" id='romaji' class="display" rows='10' cols='50'>
-          <%= romaji %>
-        </div>
+        <div name="text" id='romaji' class="display" rows='10' cols='50'><%- romaji %></div>
       </div>
     </div>
     
@@ -39,7 +35,7 @@
                   <tr>
                       <td class='col'>Word</td>
                       <td class='col'>Hiragana</td>
-                      <td class='col'>Part of Speech</td>
+                      <td class='col1'>Part of Speech</td>
                       <td class='col2'>Meaning</td>
                   </tr>
               </thead>
@@ -49,7 +45,7 @@
                     <tr>
                       <td class='col'><%= row.word %></td>
                       <td class='col'><%= row.hiragana %></td>
-                      <td class='col'><%= def.pos %></td>
+                      <td class='col1'><%= def.pos %></td>
                       <td class='col2'><%= def.definition %></td>
                     </tr>
                   <% }); %>

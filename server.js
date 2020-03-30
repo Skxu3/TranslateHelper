@@ -1,6 +1,18 @@
-var cheerio = require('cheerio');
-var express = require('express');
-var request = require('request');
+const cheerio = require('cheerio');
+const express = require('express');
+const axios = require('axios');
+const wanakana = require('wanakana');
+const Kuroshiro = require('kuroshiro');
+const KuromojiAnalyzer = require('kuroshiro-analyzer-kuromoji');
+  
+const kuroshiro = new Kuroshiro();
+const kuromojiAnalyzer = new KuromojiAnalyzer();
+
+let kuroshiroInitialized = false;
+kuroshiro.init(kuromojiAnalyzer).then(() => {
+    kuroshiroInitialized = true;
+})
+
 var server = express();
 
 server.set('view engine', 'ejs');
@@ -16,43 +28,67 @@ server.get('/', function(req, res) {
     });
 });
 
-server.post('/process', function(req, res) {
+server.post('/process', async function(req, res) {
     var rawText = req.body.rawText;
-	var wwwjdicUrl = 'http://nihongo.monash.edu/cgi-bin/wwwjdic?EZIH' + encodeURIComponent(rawText);
+    
+    var romajiText = "";
     var glossing = [];
-    request({
-        method: 'GET',
-        url: wwwjdicUrl
-    }, (error, result, body) => {
-        if (error) return console.error(error);
-        
-        let $ = cheerio.load(body);
-        let allWords = [];
-        $('li').each(function(i, elem) {
-            let rowParts = translationRowToParts($(this).text());
-            if (!allWords.includes(rowParts['word'])) {
-                glossing.push(rowParts);
-                allWords.push(rowParts['word']);
-            }
-        });
-
-        res.render('index', {
-            textAreaInput: rawText,
-            romaji: rawText,
-            textGlossing: glossing
-        });
-
-    });
-
-
+    axios.all([getRomaji(rawText), getGlossingRows(rawText)])
+        .then(axios.spread(function(romajiText, glossing) {
+            res.render('index', {
+                textAreaInput: rawText,
+                romaji: romajiText,
+                textGlossing: glossing
+            });
+        }));
 });
+
+
+async function getRomaji(rawText) {
+    if (!kuroshiroInitialized) {
+        await kuroshiro.init(kuromojiAnalyzer);
+    }
+    return kuroshiro.convert(rawText, {to: "hiragana", mode: "spaced"})
+        .catch ((error) => {
+            return "";
+        })
+        .then((hiraganaText) => {
+            return wanakana.toRomaji(hiraganaText);
+        });
+}
+
+function getGlossingRows(rawText) {
+    var wwwjdicUrl = 'http://nihongo.monash.edu/cgi-bin/wwwjdic?EZIH' + encodeURIComponent(rawText);
+    return axios.get(wwwjdicUrl)
+        .catch((error) => {
+            console.log(error.data);
+            return [];
+        })
+        .then((response) => {
+            return translationRowsToGlossing(response.data);
+        });
+}
+
+function translationRowsToGlossing(rawRows) {
+    var glossing = [];
+    let $ = cheerio.load(rawRows);
+    let allWords = [];
+    $('li').each(function(i, elem) {
+        let rowParts = translationRowToParts($(this).text());
+        if (!allWords.includes(rowParts['word'])) {
+            glossing.push(rowParts);
+            allWords.push(rowParts['word']);
+        }
+    });
+    return glossing;
+}
 
 /** 
  * Given a row of translation, parse it into parts
  *
  * @return [word, hiragana, pos1, def1, pos2, def2...]
  */
-function translationRowToParts(translationRow){
+function translationRowToParts(translationRow) {
     let parts = {}; 
     if (translationRow.includes("Possible inflected")) {
         idxEndOfMsg = translationRow.indexOf(")");
