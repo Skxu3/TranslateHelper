@@ -1,4 +1,4 @@
-<!DOCTYPE html lang="en"><html>
+<!DOCTYPE html><html lang="en">
 
  <head>
   <title>Translate Helper</title>
@@ -11,7 +11,8 @@
 
  <body>
    <div class="container text-center" id='content'>
-    <a href="/">Home</a>
+    <a href="/">Clear</a>
+
     <div class="row">
       <div class="left col-sm-6">
         <h3>Input Text</h3>
@@ -22,44 +23,39 @@
       </div>
       <div class="right col-sm-6">
         <h3>Romaji</h3>
-        <div name="text" id='romaji' class="display" rows='10' cols='50'><%- romaji %></div>
+        <div name="text" id='romaji'><%- romaji %></div>
       </div>
     </div>
-    
-    <div class="row">
-      <h3>Text Glossing</h3>
-      <div name="text" id='text-glossing'>
-        <% if (textGlossing.length > 0) { %>
-          <table id="textGlossingTable">
-              <thead>
-                  <tr>
-                      <td class='col'>Word</td>
-                      <td class='col'>Hiragana</td>
-                      <td class='col1'>Part of Speech</td>
-                      <td class='col2'>Meaning</td>
-                  </tr>
-              </thead>
-              <tbody>
-                <% textGlossing.forEach(function(row) { %>
-                  <% row.defs.forEach(function(def) { %>
-                    <tr>
-                      <td class='col'><%= row.word %></td>
-                      <td class='col'><%= row.hiragana %></td>
-                      <td class='col1'><%= def.pos %></td>
-                      <td class='col2'><%= def.definition %></td>
-                    </tr>
-                  <% }); %>
-                <% }); %>
-              </tbody>
-          </table>
-        <% } %>
 
-      </div>
+    <div class="container" id='textGlossing'>
+      <h3>Text Glossing</h3>
+        <table id="textGlossingTable">
+            <thead>
+                <tr>
+                    <td class='col'>Word</td>
+                    <td class='col'>Hiragana</td>
+                    <td class='col1'>Part of Speech</td>
+                    <td class='col2'>Meaning</td>
+                </tr>
+            </thead>
+            <tbody>
+            <% if (textGlossing.length > 0) { %>
+              <% textGlossing.forEach(function(row) { %>
+                <% row.defs.forEach(function(def) { %>
+                  <tr>
+                    <td class='col'><%= row.word %></td>
+                    <td class='col'><%= row.hiragana %></td>
+                    <td class='col1'><%= def.pos %></td>
+                    <td class='col2'><%= def.definition %></td>
+                  </tr>
+                <% }); %>
+              <% }); %>
+            <% } %>
+            </tbody>
+        </table>
     </div>
 
    </div>
-
-  <script src="script.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
  </body>

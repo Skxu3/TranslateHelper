@@ -2,7 +2,9 @@
 	margin: 0 auto;
 	text-align: center;
 	overflow-y: hidden;
+	overflow-x: hidden;
 	height: 100%;
+	width: 100%;
 }
 .part {
 	padding: 5%;
@@ -41,11 +43,17 @@
 .control:hover {
 	background-color: yellow;
 }
-.display {
-	margin: 5%;
+
+.topRow {
+	max-height: 50%;
 }
-.display#romaji {
+
+#romaji {
 	white-space: pre;
+	padding: 2%;
+	display: block;
+	max-height: 250px;
+	overflow-y: scroll;
 }
 
 textarea{
@@ -57,49 +65,53 @@ iframe {
 	margin: 0 auto;
 }
 
+#textGlossing {
+	margin: 2%;
+}
+
 table {
-  width: 100%;
+  	width: 100%;
 }
 
 table, td {
-  border-collapse: collapse;
-  border: 1px solid #000;
+	border-collapse: collapse;
+	border: 1px solid #000;
 }
 
 thead {
-  display: table;
-  width: 100%;
-  background-color: #FEF9E7;
+	display: table;
+	width: 100%;
+	background-color: #FEF9E7;
 }
 
 tbody {
-  display: block;
-  max-height: 200px;
-  overflow-y: scroll;
+	display: block;
+	max-height: 200px;
+	overflow-y: scroll;
 }
 
 th, td.col {
-  width: 18%;
+	width: 18%;
 }
 
 th, td.col1 {
-  width: 14%;
+	width: 14%;
 }
 
- th, td.col2 {
-  width: 48%;
+th, td.col2 {
+	width: 48%;
 }
 
 tr {
-  display: table;
-  width: 100%;
-  box-sizing: border-box;
+	display: table;
+	width: 100%;
+	box-sizing: border-box;
 }
 
 td {
-  text-align: center;
-  border-bottom: none;
-  border-left: none;
-  padding: 1%;
-  font-size: 16px;
+	text-align: center;
+	border-bottom: none;
+	border-left: none;
+	padding: 1%;
+	font-size: 16px;
 }
