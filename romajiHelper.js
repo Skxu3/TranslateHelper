@@ -47,18 +47,25 @@ class RomajiHelper {
     if (line.match('[a-z]') == null) { // no letters to fix
       return line;
     }
-    let firstAlphaIdx = line.match('[a-z]').index;
-    let outputLine = this.strReplaceAt(line, firstAlphaIdx, line[firstAlphaIdx].toUpperCase());
-    line = line.substring(firstAlphaIdx + 1, line.length);
 
-    while (line.match('[.!? ]') != null) {
-      line = line.substring(line.match('[.!? ]').index + 1, line.length);
+    let firstLetterIdx = line.match('[a-zA-Z]').index;
+    let outputLine = this.strReplaceAt(line, firstLetterIdx,
+        line[firstLetterIdx].toUpperCase());
+    let offset = firstLetterIdx + 1;
+    line = line.substring(offset, line.length);
+
+    while (line.match('[.!?\t]') != null) {
+      const splitterIdx = line.match('[.!?\t]').index;
+      offset += splitterIdx;
+      line = line.substring(splitterIdx + 1, line.length);
       if (line.match('[a-z]') == null) {
         break;
       } else {
-        firstAlphaIdx = line.match('[a-z]').index;
-        outputLine = this.strReplaceAt(outputLine, firstAlphaIdx, line[firstAlphaIdx].toUpperCase());
-        line = line.substring(firstAlphaIdx + 1, line.length);
+        firstLetterIdx = line.match('[a-zA-Z]').index;
+        offset += firstLetterIdx + 1;
+        outputLine = this.strReplaceAt(outputLine, offset, line[firstLetterIdx].toUpperCase());
+        offset += 1;
+        line = line.substring(firstLetterIdx + 1, line.length);
       }
     }
     return outputLine;

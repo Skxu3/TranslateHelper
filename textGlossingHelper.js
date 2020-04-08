@@ -96,14 +96,17 @@ class TextGlossingHelper {
 
   /**
    * Given a row of translation, parse it into parts
-   * @return {array} [word, hiragana, pos1, def1, pos2, def2...]
+   * @return {dictionary} {word, hiragana,
+   * [{pos, definition}, {pos, definition}...]}
    */
   translationRowToParts(translationRow) {
     const parts = {};
+
     if (translationRow.includes('Possible inflected')) {
       const idxEndOfMsg = translationRow.indexOf(')');
       translationRow = translationRow.substring(idxEndOfMsg + 1, translationRow.length);
     }
+
     const idxStartOfJWN = translationRow.indexOf('JWN');
     if (idxStartOfJWN > 0) {
       translationRow = translationRow.substring(0, idxStartOfJWN).trim();

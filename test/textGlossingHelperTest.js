@@ -1,4 +1,3 @@
-const {alphaPunctuation, chorus, fullSong} = require('./testConstants.js');
 const TextGlossingHelper = require('../textGlossingHelper.js');
 const textGlossingHelper = new TextGlossingHelper();
 
