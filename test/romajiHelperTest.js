@@ -48,7 +48,9 @@ describe('Apply common fixes', () => {
     expect(romajiHelper.applyCommonFixes('')).toEqual('');
 
     expect(romajiHelper.applyCommonFixes(input)).toEqual(output);
+    expect(romajiHelper.applyCommonFixes(output)).toEqual(output);
 
-    expect(romajiHelper.fixCapitalization(input2)).toEqual(output2);
+    expect(romajiHelper.applyCommonFixes(input2)).toEqual(output2);
+    expect(romajiHelper.applyCommonFixes(output2)).toEqual(output2);
   });
 });

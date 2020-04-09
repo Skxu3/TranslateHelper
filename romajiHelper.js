@@ -2,10 +2,17 @@ const wanakana = require('wanakana');
 const Kuroshiro = require('kuroshiro');
 const KuromojiAnalyzer = require('kuroshiro-analyzer-kuromoji');
 
-const beforeChange = ['o', 'ha', 'e', 'ichi nin', 'ō', 'ī', 'ā', 'ū'];
-const afterChange = ['wo', 'wa', 'he', 'hitori', 'ou', 'ii', 'aa', 'uu'];
-const needToMerge = ['tte', 'ta', 'da', 'i', 'te',
-  'de', 'nai', 'zu', 'n', 'u', 'tara', 'ba'];
+const simpleChangeDic = {
+  'o': 'wo',
+  'ha': 'wa',
+  'e': 'he',
+};
+const complexChangeDic = {
+  'ichi nin': 'hitori',
+  'de mo': 'demo',
+  'saken deru': 'sakenderu',
+};
+const toMerge = ['i', 'u', 'n', 'ba', 'ta', 'da', 'te', 'tte', 'nai', 'tai', 'tara', 'reru', 'rareru'];
 
 /**
  * dsds
@@ -34,11 +41,16 @@ class RomajiHelper {
     }
     return this.kuroshiro.convert(rawText, {to: 'hiragana', mode: 'spaced'})
         .catch((error) => {
-          console.log(error);
+          console.log(error.message);
+          console.log(error.stack);
           return '';
         })
         .then((hiraganaText) => {
-          return wanakana.toRomaji(hiraganaText);
+          const romaji = wanakana.toRomaji(hiraganaText);
+
+          return romaji.split('\n').map((line) => {
+            return this.fixCapitalization(this.applyCommonFixes(line));
+          }).join('\n');
         });
   }
 
@@ -63,7 +75,8 @@ class RomajiHelper {
       } else {
         firstLetterIdx = line.match('[a-zA-Z]').index;
         offset += firstLetterIdx + 1;
-        outputLine = this.strReplaceAt(outputLine, offset, line[firstLetterIdx].toUpperCase());
+        outputLine = this.strReplaceAt(outputLine, offset,
+          line[firstLetterIdx].toUpperCase());
         offset += 1;
         line = line.substring(firstLetterIdx + 1, line.length);
       }
@@ -79,41 +92,26 @@ class RomajiHelper {
 
   /** Given a line of romaji, apply common fixes. */
   applyCommonFixes(line) {
-    const words = line.match(/\S+/g);
-    let index = -2;
-    for (let i = 0; i < words.length; i++) {
-      let check = words[i];
-      let prefix = '';
-      let suffix = '';
-      if (words[i].length > 2) {
-        if ((words[i][0].match(/[^a-zA-Z]/) != null) &&
-          (words[i][words[i].length - 1].match(/[^a-zA-Z]/) != null)) {
-          check = words[i].substring(1, words[i].length - 1);
-          prefix = words[i][0];
-          suffix = words[i][words[i].length - 1];
-        }
-      }
-      if (words[i].length > 1) {
-        if ((words[i][0].match(/[^a-zA-Z]/) != null)) {
-          check = words[i].substring(1, words[i].length);
-          prefix = words[i][0];
-        }
-        if ((words[i][words[i].length - 1].match(/[^a-zA-Z]/) != null)) {
-          check = words[i].substring(0, words[i].length - 1);
-          suffix = words[i][words[i].length - 1];
-        }
-      }
-      index = beforeChange.indexOf(check);
-      if (index > -1) {
-        words[i] = prefix + afterChange[index] + suffix;
-      }
-      index = needToMerge.indexOf(check);
-      if (index > 0) {
-        words[i - 1] += words[i];
-        words.splice(i, 1);
+    if (line.match(/\S+/g) == null) {
+      return line;
+    }
+    for (const before in complexChangeDic) {
+      if (line.indexOf(before) > 0) {
+        line = line.replace(before, complexChangeDic[before]);
       }
     }
-    return words.join(' ');
+    const words = line.match(/\S+/g);
+    const result = [];
+    for (let i = 0; i < words.length; i++) {
+      if (toMerge.indexOf(words[i]) > 0) {
+        result[result.length - 1] += words[i];
+        continue;
+      }
+      words[i] = (words[i] in simpleChangeDic) ?
+        simpleChangeDic[words[i]] : words[i];
+      result.push(words[i]);
+    }
+    return result.join(' ');
   }
 }
 

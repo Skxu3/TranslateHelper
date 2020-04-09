@@ -1,6 +1,5 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const XRegExp = require('xregexp');
 
 const wwjdicBaseUrl = 'http://nihongo.monash.edu/cgi-bin/wwwjdic?EZIH';
 
@@ -19,25 +18,19 @@ class TextGlossingHelper {
     // split raw text into chunks to not overwhelm wwdjic server
     const textChunks = this.preprocessText(rawText);
 
-    const promises = [];
-    let rows = [];
-
-    textChunks.forEach((text) => {
-      console.log(wwjdicBaseUrl + encodeURIComponent(text));
-      promises.push(axios.get(wwjdicBaseUrl + encodeURIComponent(text)));
+    const promises = textChunks.map((text) => {
+      return axios.get(wwjdicBaseUrl + encodeURIComponent(text));
     });
 
     return axios.all(promises)
         .catch((error) => {
-          console.log(error);
-          return rows;
+          console.log('textGlossingHelper error');
+          return [];
         })
         .then((results) => {
-          results.forEach((response) => {
-            rows = rows.concat(this.translationRowsToGlossing(response.data));
-          });
-          console.log(rows.length);
-          return rows;
+          return [].concat(...results.map((response) => {
+            return this.translationRowsToGlossing(response.data);
+          }));
         });
   }
 
@@ -84,8 +77,8 @@ class TextGlossingHelper {
   translationRowsToGlossing(wwwjdicResponse) {
     const glossing = [];
     const $ = cheerio.load(wwwjdicResponse);
-    $('li').each((i, elem) => {
-      const rowParts = this.translationRowToParts($(this).text());
+    $('body li').each((i, elem) => {
+      const rowParts = this.translationRowToParts($(elem).text());
       if (!this.allWords.includes(rowParts['word'])) {
         glossing.push(rowParts);
         this.allWords.push(rowParts['word']);
