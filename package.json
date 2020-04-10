@@ -10,12 +10,15 @@
     "type": "git",
     "url": "git+https://github.com/Starshine3/TranslateHelper.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "skxu",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/Starshine3/TranslateHelper/issues"
   },
   "homepage": "https://github.com/Starshine3/TranslateHelper#readme",
+  "engines": {
+    "node": "10.16.3"
+  },
   "dependencies": {
     "axios": "^0.19.2",
     "cheerio": "^1.0.0-rc.3",

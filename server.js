@@ -32,4 +32,8 @@ server.post('/process', async function(req, res) {
       }));
 });
 
-server.listen(8080);
+server.set('port', (process.env.PORT || 8080));
+server.listen(server.get('port'), () => {
+  console.log('Node server listening to port ' +
+    server.get('port'));
+});
