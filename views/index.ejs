@@ -11,49 +11,53 @@
  </head>
 
  <body>
-   <div class="container text-center" id='content'>
+   <div class="container" id='content'>
     <a href="/">Clear</a>
 
+    <div class="row" id="header-row">
+      <h3 class="left col-sm-6">Input Text</h3>
+        <h3 class="right col-sm-6">Romaji</h3>
+    </div>
     <div class="row">
       <div class="left col-sm-6">
-        <h3>Input Text</h3>
         <form id="rawtext-form" action="/process" method="POST">
-            <textarea id="rawtext-textarea"  name="rawText" rows='10' cols='50'><%= textAreaInput %></textarea>
+            <textarea id="rawtext-textarea" name="rawText" rows='10' cols='50'><%= textAreaInput %></textarea>
             <div class="process-button"><button type="submit" id="process">Process</button></div>
         </form>
       </div>
       <div class="right col-sm-6">
-        <h3>Romaji</h3>
-        <div name="text" id='romaji'><%- romaji %></div>
+        <div id='romaji'><%- romaji %></div>
       </div>
     </div>
 
-    <div class="container" id='textGlossing'>
-      <h3>Text Glossing</h3>
-        <table id="textGlossingTable">
-            <thead>
+    <div id='textGlossing'>
+      <div class="row">
+        <h3 class="col-sm-11">Text Glossing</h3>
+      </div>
+      <table id="textGlossingTable">
+          <thead>
+              <tr>
+                  <td class='col'>Word</td>
+                  <td class='col'>Hiragana</td>
+                  <td class='col1'>Part of Speech</td>
+                  <td class='col2'>Meaning</td>
+              </tr>
+          </thead>
+          <tbody>
+          <% if (textGlossing.length > 0) { %>
+            <% textGlossing.forEach(function(row) { %>
+              <% row.defs.forEach(function(def) { %>
                 <tr>
-                    <td class='col'>Word</td>
-                    <td class='col'>Hiragana</td>
-                    <td class='col1'>Part of Speech</td>
-                    <td class='col2'>Meaning</td>
+                  <td class='col'><%= row.word %></td>
+                  <td class='col'><%= row.hiragana %></td>
+                  <td class='col1'><%= def.pos %></td>
+                  <td class='col2'><%= def.definition %></td>
                 </tr>
-            </thead>
-            <tbody>
-            <% if (textGlossing.length > 0) { %>
-              <% textGlossing.forEach(function(row) { %>
-                <% row.defs.forEach(function(def) { %>
-                  <tr>
-                    <td class='col'><%= row.word %></td>
-                    <td class='col'><%= row.hiragana %></td>
-                    <td class='col1'><%= def.pos %></td>
-                    <td class='col2'><%= def.definition %></td>
-                  </tr>
-                <% }); %>
               <% }); %>
-            <% } %>
-            </tbody>
-        </table>
+            <% }); %>
+          <% } %>
+          </tbody>
+      </table>
     </div>
 
    </div>

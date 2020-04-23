@@ -1,25 +1,27 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const wwjdicBaseUrl = 'http://nihongo.monash.edu/cgi-bin/wwwjdic?EZIH';
+const wwjdicWordNetUrl = 'http://nihongo.monash.edu/cgi-bin/wwwjdic?EZIH';
+const wwjdicTextGlossingUrl = 'http://nihongo.monash.edu/cgi-bin/wwwjdic?9ZIH';
+
+const hideWords = ['いだ', 'いた', 'これは', 'さよなら', 'って', '君', 'でも',
+  'して', 'あの', ''];
 
 /**
  * dsds
  */
 class TextGlossingHelper {
-  constructor() {
-    this.allWords = [];
-  }
-
   /** Given raw Japanese text, convert it to a list of translation parts */
   getGlossingRows(rawText) {
-    this.allWords = [];
+    this.allWords = [...hideWords];
 
     // split raw text into chunks to not overwhelm wwdjic server
     const textChunks = this.preprocessText(rawText);
+    console.log(textChunks);
 
     const promises = textChunks.map((text) => {
-      return axios.get(wwjdicBaseUrl + encodeURIComponent(text));
+      console.log(wwjdicWordNetUrl + encodeURIComponent(text));
+      return axios.get(wwjdicWordNetUrl + encodeURIComponent(text));
     });
 
     return axios.all(promises)
@@ -38,7 +40,7 @@ class TextGlossingHelper {
    * Given raw Japanese text, remove all non-Japanese characters,
    * then break apart text into chunks of <200 characters.
    *
-   * Adds \n between every line of text.
+   * Adds 's' between every line of text to mark separation.
    */
   preprocessText(rawText) {
     const uniqueLines = Array.from(new Set(rawText.split('\n')));
@@ -48,7 +50,7 @@ class TextGlossingHelper {
       const line = this.extractJapaneseStr(uniqueLines[i]);
       if (line !== '') {
         if (line.length + text.length < 200) {
-          text += line + '\n';
+          text += line + 's';
         } else {
           textChunks.push(text);
           text = '';
@@ -66,7 +68,7 @@ class TextGlossingHelper {
    * @param string
    */
   extractJapaneseStr(string) {
-    const result = string.match(/[\u3041-\u3096\u3400-\u9FFF]/g);
+    const result = string.match(/[\u3041-\u3096\u30a1-\u30ff\u3400-\u9FFF]/g);
     return (result == null) ? '' : result.join('');
   }
 

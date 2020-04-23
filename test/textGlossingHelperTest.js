@@ -30,6 +30,7 @@ describe('Preprocess text', () => {
       'STAND-ALONE\n' +
       '\n' +
       '(こんな小さな星座なのに...)';
+    const pureJapaneseStr = 'アイスクリームを食べるのがやめる';
 
     const japaneseStrOutput =
       ['一人立ち尽くす星の見えない夜\nこんな小さな星座なのに\n'];
@@ -39,5 +40,7 @@ describe('Preprocess text', () => {
     expect(textGlossingHelper.preprocessText(noJapaneseStr)).toEqual([]);
 
     expect(textGlossingHelper.preprocessText(japaneseStr)).toEqual(japaneseStrOutput);
+
+    expect(textGlossingHelper.preprocessText(pureJapaneseStr)).toEqual([pureJapaneseStr + '\n']);
   });
 });

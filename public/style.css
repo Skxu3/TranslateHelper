@@ -6,56 +6,8 @@
 	height: 100%;
 	width: 100%;
 }
-.part {
-	padding: 5%;
-}
-.font-bold .bold {
-	font-weight: bold;
-}
-.italic {
-	font-style: italic;
-}
-.selected {
-	background-color: yellow;
-}
-.select {
-	border: none;
-	color: brown;
-	text-decoration: none;
-	background-color: transparent;
-	margin-bottom: 5%;
-	font-size: 20px;
-}
-.select:hover {
-	color: red;
-}
-.select:disabled {
-	text-decoration: line-through;
-}
-.control {
-	border: none;
-	color: brown;
-	text-decoration: none;
-	background-color: transparent;
-	border: 2px red solid;
-	border-radius: 10px;
-}
-.control:hover {
-	background-color: yellow;
-}
 
-.topRow {
-	max-height: 50%;
-}
-
-#romaji {
-	white-space: pre;
-	padding: 2%;
-	display: block;
-	max-height: 250px;
-	overflow-y: scroll;
-}
-
+/** Styling for Input Box */
 textarea{
 	width: 85%;
 	margin: 0 auto;
@@ -65,49 +17,52 @@ iframe {
 	margin: 0 auto;
 }
 
+/** Styling for Romaji Display */
+#romaji {
+	white-space: pre-wrap;
+	padding: 2%;
+	display: block;
+	max-height: 250px;
+	overflow-y: scroll;
+	word-wrap: break-word;
+}
+
+
+/** Styling for Text Glossing */
 #textGlossing {
 	margin: 2%;
 }
-
 table {
   	width: 100%;
 }
-
 table, td {
 	border-collapse: collapse;
 	border: 1px solid #000;
 }
-
 thead {
 	display: table;
 	width: 100%;
 	background-color: #FEF9E7;
 }
-
 tbody {
 	display: block;
 	max-height: 200px;
 	overflow-y: scroll;
 }
-
 th, td.col {
 	width: 18%;
 }
-
 th, td.col1 {
 	width: 14%;
 }
-
 th, td.col2 {
 	width: 48%;
 }
-
 tr {
 	display: table;
 	width: 100%;
 	box-sizing: border-box;
 }
-
 td {
 	text-align: center;
 	border-bottom: none;
