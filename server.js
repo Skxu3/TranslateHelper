@@ -17,6 +17,8 @@ server.get('/', function(req, res) {
     textAreaInput: '',
     romaji: '',
     textGlossing: [],
+    queryInput: '',
+    queryResult: [],
   });
 });
 
@@ -28,6 +30,8 @@ server.post('/process', async function(req, res) {
           textAreaInput: rawText,
           romaji: romajiText,
           textGlossing: glossing,
+          queryInput: '',
+          queryResult: [],
         });
       }));
 });

@@ -54,3 +54,24 @@ describe('Apply common fixes', () => {
     expect(romajiHelper.applyCommonFixes(output2)).toEqual(output2);
   });
 });
+
+describe('Fixing spacing', () => {
+  test('Should rid extra space near punctuations', () => {
+    const input = 'Hey ( You let me down )\n';
+    const input2 = 'Today ? Fuchi he ( Your time is up )\n';
+    const input3 = 'I \' m happy!\n';
+
+    const output = 'Hey (You let me down)\n';
+    const output2 = 'Today? Fuchi he (Your time is up)\n';
+    const output3 = 'I\'m happy!\n';
+
+    expect(romajiHelper.fixSpacing(input)).toEqual(output);
+    expect(romajiHelper.fixSpacing(output)).toEqual(output);
+
+    expect(romajiHelper.fixSpacing(input2)).toEqual(output2);
+    expect(romajiHelper.fixSpacing(output2)).toEqual(output2);
+
+    expect(romajiHelper.fixSpacing(input3)).toEqual(output3);
+    expect(romajiHelper.fixSpacing(output3)).toEqual(output3);
+  });
+});

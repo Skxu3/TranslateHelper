@@ -12,7 +12,12 @@ const complexChangeDic = {
   'de mo': 'demo',
   'saken deru': 'sakenderu',
 };
-const toMerge = ['i', 'u', 'n', 'ba', 'ta', 'da', 'te', 'tte', 'nai', 'tai', 'tara', 'reru', 'rareru'];
+const toMerge = [
+  'i', 'u', 'n',
+  'ba', 'ta', 'da', 'te', 'ze', 'zu',
+  'tte', 'nai', 'tai',
+  'tara', 'reru', 'rareru',
+];
 
 /**
  * dsds
@@ -46,12 +51,24 @@ class RomajiHelper {
           return '';
         })
         .then((hiraganaText) => {
-          const romaji = wanakana.toRomaji(hiraganaText);
-
+          const romaji = this.fixSpacing(wanakana.toRomaji(hiraganaText));
           return romaji.split('\n').map((line) => {
             return this.fixCapitalization(this.applyCommonFixes(line));
           }).join('\n');
         });
+  }
+
+  /**
+   * Given raw romaji, rid extra space near punctuations and
+   * in between words.
+   */
+  fixSpacing(rawRomaji) {
+    return rawRomaji
+        .replace(/  +/g, ' ')
+        .replace(/(\(|\[)(\s)/g, '$1')
+        .replace(/(\s)(\)|\])/g, '$2')
+        .replace(/(\s)(\.|,|!|%|;|:|\?)/g, '$2')
+        .replace(/(\s)('|`|’)(\s)/g, '$2');
   }
 
   /** Given a line of romaji, capitalize certain letters. */

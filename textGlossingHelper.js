@@ -17,10 +17,8 @@ class TextGlossingHelper {
 
     // split raw text into chunks to not overwhelm wwdjic server
     const textChunks = this.preprocessText(rawText);
-    console.log(textChunks);
 
     const promises = textChunks.map((text) => {
-      console.log(wwjdicWordNetUrl + encodeURIComponent(text));
       return axios.get(wwjdicWordNetUrl + encodeURIComponent(text));
     });
 
@@ -40,7 +38,8 @@ class TextGlossingHelper {
    * Given raw Japanese text, remove all non-Japanese characters,
    * then break apart text into chunks of <200 characters.
    *
-   * Adds 's' between every line of text to mark separation.
+   * Adds 's' between every line of text to mark separation because
+   * 's' won't be encoded into uri.
    */
   preprocessText(rawText) {
     const uniqueLines = Array.from(new Set(rawText.split('\n')));
