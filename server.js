@@ -24,10 +24,11 @@ server.get('/', function(req, res) {
 
 server.post('/process', async function(req, res) {
   const rawText = req.body.rawText;
-  axios.all([romajiHelper.getRomaji(rawText), textGlossingHelper.getGlossingRows(rawText)])
+  const text = rawText.replace(/(\r\n|\r|\n){2,}/g, '$1\n')
+  axios.all([romajiHelper.getRomaji(text), textGlossingHelper.getGlossingRows(text)])
       .then(axios.spread(function(romajiText, glossing) {
         res.render('index', {
-          textAreaInput: rawText,
+          textAreaInput: text,
           romaji: romajiText,
           textGlossing: glossing,
           queryInput: '',

@@ -57,36 +57,36 @@
     </div>
     <% } %>
 
-    <div id='quickSearch'>
-      <form class="row" id="quickSearch-form" action="/lookup" method="POST">
-        <textarea class="left col-sm-10" id="quickSearch-textarea" name="query" rows='1' placeholder="Quick word/phrase lookup"><%= queryInput %></textarea>
-        <div class="search-button right col-sm-2"><button type="submit" id="search">Lookup</button></div>
-      </form>
-      <% if (queryResult.length > 0) { %>
-      <table id="quickSearchTable">
-          <thead>
-              <tr>
-                  <td class='col'>Word</td>
-                  <td class='col'>Hiragana</td>
-                  <td class='col1'>Part of Speech</td>
-                  <td class='col2'>Meaning</td>
-              </tr>
-          </thead>
-          <tbody>
-            <% queryResult.forEach(function(row) { %>
-              <% row.defs.forEach(function(def) { %>
-                <tr>
-                  <td class='col'><%= row.word %></td>
-                  <td class='col'><%= row.hiragana %></td>
-                  <td class='col1'><%= def.pos %></td>
-                  <td class='col2'><%= def.definition %></td>
-                </tr>
-              <% }); %>
-            <% }); %>
-          </tbody>
-      </table>
-      <% } %>
-    </div>
+<!--    <div id='quickSearch'>-->
+<!--      <form class="row" id="quickSearch-form" action="/lookup" method="POST">-->
+<!--        <textarea class="left col-sm-10" id="quickSearch-textarea" name="query" rows='1' placeholder="Quick word/phrase lookup"><%= queryInput %></textarea>-->
+<!--        <div class="search-button right col-sm-2"><button type="submit" id="search">Lookup</button></div>-->
+<!--      </form>-->
+<!--      <% if (queryResult.length > 0) { %>-->
+<!--      <table id="quickSearchTable">-->
+<!--          <thead>-->
+<!--              <tr>-->
+<!--                  <td class='col'>Word</td>-->
+<!--                  <td class='col'>Hiragana</td>-->
+<!--                  <td class='col1'>Part of Speech</td>-->
+<!--                  <td class='col2'>Meaning</td>-->
+<!--              </tr>-->
+<!--          </thead>-->
+<!--          <tbody>-->
+<!--            <% queryResult.forEach(function(row) { %>-->
+<!--              <% row.defs.forEach(function(def) { %>-->
+<!--                <tr>-->
+<!--                  <td class='col'><%= row.word %></td>-->
+<!--                  <td class='col'><%= row.hiragana %></td>-->
+<!--                  <td class='col1'><%= def.pos %></td>-->
+<!--                  <td class='col2'><%= def.definition %></td>-->
+<!--                </tr>-->
+<!--              <% }); %>-->
+<!--            <% }); %>-->
+<!--          </tbody>-->
+<!--      </table>-->
+<!--      <% } %>-->
+<!--    </div>-->
 
    </div>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
