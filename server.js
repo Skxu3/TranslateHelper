@@ -12,6 +12,20 @@ server.use(express.json());
 server.use(express.urlencoded({extended: true}));
 server.use(express.static('public/'));
 
+const textGlossingConfig = {
+  dictionaryType: 'wordNet', // or 'textGloss'
+  hideCommonWords: true,
+};
+
+const romajiConfig = {
+  outputFormat: 'romaji', // or 'furigana'
+  capitalizeFirstLetter: false,
+};
+
+const uiConfig = {
+  autoCopyToClipboard: true,
+};
+
 server.get('/', function(req, res) {
   res.render('index', {
     textAreaInput: '',
@@ -19,14 +33,14 @@ server.get('/', function(req, res) {
     textGlossing: [],
     queryInput: '',
     queryResult: [],
+    // uiConfig: {},
   });
 });
 
 server.post('/process', async function(req, res) {
   const rawText = req.body.rawText;
-  const text = rawText.replace(/(\r\n){2,}/g, '$1\n')
-  console.log(text);
-  axios.all([romajiHelper.getRomaji(text), textGlossingHelper.getGlossingRows(text)])
+  const text = rawText.replace(/(\r\n){2,}/g, '$1\n');
+  axios.all([romajiHelper.getRomaji(romajiConfig, text), textGlossingHelper.getGlossingRows(textGlossingConfig, text)])
       .then(axios.spread(function(romajiText, glossing) {
         res.render('index', {
           textAreaInput: text,
@@ -34,6 +48,7 @@ server.post('/process', async function(req, res) {
           textGlossing: glossing,
           queryInput: '',
           queryResult: [],
+          // uiConfig: uiConfig,
         });
       }));
 });

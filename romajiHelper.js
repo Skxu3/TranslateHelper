@@ -2,25 +2,47 @@ const wanakana = require('wanakana');
 const Kuroshiro = require('kuroshiro');
 const KuromojiAnalyzer = require('kuroshiro-analyzer-kuromoji');
 
+const preprocessDic = {
+  '照る': 'teru',
+  '出る': 'deru',
+};
+
+/** Dictionary of simple changes to apply to raw romaji output from kuroshiro. */
 const simpleChangeDic = {
   'o': 'wo',
   'ha': 'wa',
   'e': 'he',
+  '‘ ': '\'',
 };
+
+/** Dictionary of complex changes to apply to raw romaji output from kuroshiro. */
 const complexChangeDic = {
   'ichi nin': 'hitori',
-  'de mo': 'demo',
-  'saken deru': 'sakenderu',
+  'ichi kai': 'ikkai',
+  'ichi hai': 'ippai',
+  'ichi hon': 'ippon',
+  'ichi satsu': 'issatsu',
+  'you na': 'youna',
+  'you ni': 'youni',
 };
+
+// Wouldn't be by themselves.
+const counters = ['bu', 'dai', 'hai', 'hiki', 'kai', 'mai', 'nin', 'satsu', 'tsu'];
+
+/** Dictionary of changes to apply to raw romaji output from kuroshiro. */
 const toMerge = [
-  'i', 'u', 'n',
-  'ba', 'ta', 'da', 'te', 'ze', 'zu',
-  'tte', 'nai', 'tai',
-  'tara', 'reru', 'rareru',
+  'u', 'n',
+  'ba', 'sa', 'ta', 'da', 'te', 'ze', 'zu',
+  'kou', 'tte', 'nai', 'tai', 'kan',
+  'tara', 'tari', 'reru', 'rareru',
+];
+
+const postMerge = [
+  'takunai',
 ];
 
 /**
- * dsds
+ * Helper class to create romanization of raw Japanese text.
  */
 class RomajiHelper {
   /** */
@@ -40,22 +62,42 @@ class RomajiHelper {
   }
 
   /** Given raw Japanese text, return the text as Romaji spaced by word */
-  async getRomaji(rawText) {
+  async getRomaji(config, rawText) {
     if (!this.kuroshiroInitialized) {
       await this.initKuroshiro();
     }
-    return this.kuroshiro.convert(rawText, {to: 'hiragana', mode: 'spaced'})
+
+    if (config['outputFormat'] === 'furigana') {
+      return this.kuroshiro.convert(rawText, {to: 'hiragana', mode: 'furigana'});
+    }
+    const preprocessedText = this.preprocessText(rawText);
+    return this.kuroshiro.convert(preprocessedText, {to: 'hiragana', mode: 'spaced'})
         .catch((error) => {
           console.log(error.message);
           console.log(error.stack);
           return '';
         })
         .then((hiraganaText) => {
-          const romaji = this.fixSpacing(wanakana.toRomaji(hiraganaText));
+          // return hiraganaText;
+          const romaji = wanakana.toRomaji(hiraganaText);
+          console.log(romaji);
           return romaji.split('\n').map((line) => {
-            return this.fixCapitalization(this.applyCommonFixes(line));
+            const tempRomaji = this.fixSpacing(this.applyCommonFixes(line));
+            console.log(this.applyCommonFixes(line));
+            console.log(tempRomaji);
+            return config['capitalizeFirstLetter'] ?
+              this.fixCapitalization(tempRomaji) :
+              tempRomaji;
           }).join('\n');
         });
+  }
+
+  preprocessText(rawRomaji) {
+    let text = rawRomaji;
+    for (const word in preprocessDic) {
+      text = text.replace(word, preprocessDic[word]);
+    }
+    return text;
   }
 
   /**
@@ -93,7 +135,7 @@ class RomajiHelper {
         firstLetterIdx = line.match('[a-zA-Z]').index;
         offset += firstLetterIdx + 1;
         outputLine = this.strReplaceAt(outputLine, offset,
-          line[firstLetterIdx].toUpperCase());
+            line[firstLetterIdx].toUpperCase());
         offset += 1;
         line = line.substring(firstLetterIdx + 1, line.length);
       }
@@ -113,15 +155,19 @@ class RomajiHelper {
       return line;
     }
     for (const before in complexChangeDic) {
-      if (line.indexOf(before) > 0) {
+      if (line.includes(before)) {
         line = line.replace(before, complexChangeDic[before]);
       }
     }
     const words = line.match(/\S+/g);
-    const result = [];
-    for (let i = 0; i < words.length; i++) {
-      if (toMerge.indexOf(words[i]) > 0) {
+    const result = [words[0]];
+    for (let i = 1; i < words.length; i++) {
+      if (toMerge.includes(words[i])) {
         result[result.length - 1] += words[i];
+        if (postMerge.includes(result[result.length - 1])) {
+          const secondMerge = result.pop();
+          result[result.length - 1] += secondMerge;
+        }
         continue;
       }
       words[i] = (words[i] in simpleChangeDic) ?

@@ -8,18 +8,24 @@ const hideWords = ['いだ', 'いた', 'これは', 'さよなら', 'って', '�
   'して', 'あの', ''];
 
 /**
- * dsds
+ * Helper class that automatically generates definitions for all words in input text.
  */
 class TextGlossingHelper {
   /** Given raw Japanese text, convert it to a list of translation parts */
-  getGlossingRows(rawText) {
-    this.allWords = [...hideWords];
+  getGlossingRows(config, rawText) {
+    this.allWords = config['hideCommonWords'] ?
+      [...hideWords] :
+      [];
 
     // split raw text into chunks to not overwhelm wwdjic server
     const textChunks = this.preprocessText(rawText);
 
     const promises = textChunks.map((text) => {
-      return axios.get(wwjdicWordNetUrl + encodeURIComponent(text));
+      const dictionaryType = config['dictionaryType'];
+      const dictionaryUrl = dictionaryType === 'wordNet' ?
+        wwjdicWordNetUrl :
+        wwjdicTextGlossingUrl;
+      return axios.get(dictionaryUrl + encodeURIComponent(text));
     });
 
     return axios.all(promises)
