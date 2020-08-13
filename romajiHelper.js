@@ -1,45 +1,8 @@
 const wanakana = require('wanakana');
 const Kuroshiro = require('kuroshiro');
 const KuromojiAnalyzer = require('kuroshiro-analyzer-kuromoji');
+const {simpleChangeChars, simpleChangeWords, complexChangeDic, split, toMerge, hyphenMerge, postMerge, conditionalPostMerge, interrogative} = require('./romajiUtils.js');
 
-const preprocessDic = {
-  '照る': 'teru',
-  '出る': 'deru',
-};
-
-/** Dictionary of simple changes to apply to raw romaji output from kuroshiro. */
-const simpleChangeDic = {
-  'o': 'wo',
-  'ha': 'wa',
-  'e': 'he',
-  '‘ ': '\'',
-};
-
-/** Dictionary of complex changes to apply to raw romaji output from kuroshiro. */
-const complexChangeDic = {
-  'ichi nin': 'hitori',
-  'ichi kai': 'ikkai',
-  'ichi hai': 'ippai',
-  'ichi hon': 'ippon',
-  'ichi satsu': 'issatsu',
-  'you na': 'youna',
-  'you ni': 'youni',
-};
-
-// Wouldn't be by themselves.
-const counters = ['bu', 'dai', 'hai', 'hiki', 'kai', 'mai', 'nin', 'satsu', 'tsu'];
-
-/** Dictionary of changes to apply to raw romaji output from kuroshiro. */
-const toMerge = [
-  'u', 'n',
-  'ba', 'sa', 'ta', 'da', 'te', 'ze', 'zu',
-  'kou', 'tte', 'nai', 'tai', 'kan',
-  'tara', 'tari', 'reru', 'rareru',
-];
-
-const postMerge = [
-  'takunai',
-];
 
 /**
  * Helper class to create romanization of raw Japanese text.
@@ -81,36 +44,58 @@ class RomajiHelper {
           // return hiraganaText;
           const romaji = wanakana.toRomaji(hiraganaText);
           console.log(romaji);
-          return romaji.split('\n').map((line) => {
-            const tempRomaji = this.fixSpacing(this.applyCommonFixes(line));
-            console.log(this.applyCommonFixes(line));
-            console.log(tempRomaji);
-            return config['capitalizeFirstLetter'] ?
-              this.fixCapitalization(tempRomaji) :
-              tempRomaji;
-          }).join('\n');
+          return this.processRomaji(romaji, config);
         });
   }
 
   preprocessText(rawRomaji) {
     let text = rawRomaji;
-    for (const word in preprocessDic) {
-      text = text.replace(word, preprocessDic[word]);
+    for (const char in simpleChangeChars) {
+      text = text.replace(char, simpleChangeChars[char]);
     }
     return text;
   }
 
+  processRomaji(romaji, config) {
+    return romaji.split('\n').map((line) => {
+      const tempRomaji = this.fixSpacing(this.applyCommonFixes(line));
+      return config['capitalizeFirstLetter'] ?
+        this.fixCapitalization(tempRomaji) :
+        tempRomaji;
+    }).join('\n');
+  }
+
   /**
-   * Given raw romaji, rid extra space near punctuations and
+   * Given romaji, rid extra space near punctuations and
    * in between words.
    */
-  fixSpacing(rawRomaji) {
-    return rawRomaji
+  fixSpacing(romaji) {
+    let fixedSpacing = romaji
         .replace(/  +/g, ' ')
-        .replace(/(\(|\[)(\s)/g, '$1')
-        .replace(/(\s)(\)|\])/g, '$2')
-        .replace(/(\s)(\.|,|!|%|;|:|\?)/g, '$2')
-        .replace(/(\s)('|`|’)(\s)/g, '$2');
+        .replace(/(\(|\[|")(\s)/g, '$1')
+        .replace(/(\s)(\)|\]|\.|,|!|%|;|:|\?|")/g, '$2');
+    const apostrophe = fixedSpacing.match(/'/g);
+    if (!apostrophe) {
+      return fixedSpacing;
+    }
+    let finalString = '';
+    let numApostrophe = apostrophe.length;
+    while (numApostrophe > 1) {
+      const idxFirstApostrophe = fixedSpacing.indexOf('\'');
+      const idxSecondApostrophe = fixedSpacing.indexOf('\'', idxFirstApostrophe + 1);
+      const fixed = fixedSpacing.substring(idxFirstApostrophe, idxSecondApostrophe + 1)
+        .replace('\' ', '\'')
+        .replace(' \'', '\'');
+      finalString += fixedSpacing.substring(0, idxFirstApostrophe) + fixed;
+      fixedSpacing = fixedSpacing.substring(idxSecondApostrophe + 1, fixedSpacing.length);
+      numApostrophe -= 2;
+    }
+    if (numApostrophe == 1) {
+      finalString += fixedSpacing.replace(/(\s)(')(\s)/g, '$2');
+    } else {
+      finalString += fixedSpacing;
+    }
+    return finalString;
   }
 
   /** Given a line of romaji, capitalize certain letters. */
@@ -159,19 +144,70 @@ class RomajiHelper {
         line = line.replace(before, complexChangeDic[before]);
       }
     }
+    for (const toSplit of split) {
+      const toSplitPosition = line.indexOf(toSplit);
+      if (toSplitPosition > 0 && line.charAt(toSplitPosition - 1) !== ' ') {
+        line = line.substring(0, toSplitPosition) +
+          ' ' + line.substring(toSplitPosition, line.length);
+      }
+    }
     const words = line.match(/\S+/g);
-    const result = [words[0]];
-    for (let i = 1; i < words.length; i++) {
-      if (toMerge.includes(words[i])) {
-        result[result.length - 1] += words[i];
-        if (postMerge.includes(result[result.length - 1])) {
-          const secondMerge = result.pop();
-          result[result.length - 1] += secondMerge;
+    const result = [];
+    for (let i = 0; i < words.length; i++) {
+      words[i] = (words[i] in simpleChangeWords) ?
+        simpleChangeWords[words[i]] : words[i];
+
+      const lastResultIndex = result.length - 1;
+      if (i > 0) {
+        if (hyphenMerge.includes(words[i])) {
+          result[lastResultIndex] += '-' + words[i];
+          continue;
         }
+        if (toMerge.includes(words[i])) {
+          result[lastResultIndex] += words[i];
+          if (postMerge.includes(result[lastResultIndex])) {
+            const secondMerge = result.pop();
+            result[lastResultIndex] += secondMerge;
+          }
+          continue;
+        }
+        if (Object.keys(conditionalPostMerge).includes(words[i])) {
+          const prevWords = conditionalPostMerge[words[i]];
+          let prevWord = '';
+          if (!Array.isArray(prevWords) && result[lastResultIndex].endsWith(prevWords)) {
+            prevWord = prevWords;
+          } else if (Array.isArray(prevWords)) {
+            for (const prev of prevWords) {
+              if (result[lastResultIndex].endsWith(prev)) {
+                prevWord = prev;
+              }
+            }
+          }
+          if (prevWord !== '' && result[lastResultIndex].length > prevWord.length) {
+            result[lastResultIndex] += words[i];
+            continue;
+          }
+        }
+        if (interrogative.closed.includes(words[i]) && interrogative.words.includes(words[i-1])) {
+          result[lastResultIndex] += words[i];
+          continue;
+        }
+      }
+      let fixedInterrogative = false;
+      for (const prefix of interrogative.words) {
+        if (words[i].startsWith(prefix)) {
+          for (const open of interrogative.open) {
+            if (words[i].substring(prefix.length, words[i].length).startsWith(open)) {
+              result.push(prefix);
+              result.push(words[i].substring(prefix.length, words[i].length));
+              fixedInterrogative = true;
+            }
+          }
+        }
+      }
+      if (fixedInterrogative) {
         continue;
       }
-      words[i] = (words[i] in simpleChangeDic) ?
-        simpleChangeDic[words[i]] : words[i];
       result.push(words[i]);
     }
     return result.join(' ');
