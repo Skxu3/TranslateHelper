@@ -5,16 +5,17 @@ const preprocessDic = {
 
 /** Dictionary of simple changes to apply to raw romaji output from kuroshiro. */
 const simpleChangeChars = {
-  '‘ ': '\'',
-  ' ’': '\'',
+  '‘': '\'',
+  '’': '\'',
+  '’': '\'',
   '/': '\.',
   '“': '"',
   '”': '"',
 
   // double width
   '＂': '"',
-  '？': '?',
-  '！': '!',
+  '\？': '?',
+  '\！': '!',
   '（': '(',
   '）': ')',
   '、': ',',
@@ -24,13 +25,16 @@ const simpleChangeChars = {
   '『': '"',
   '』': '"',
   '君': 'kimi',
-}
+  '×': 'batsu',
+  // 'って': 'tte',
+  // 'った': 'tta',
+};
 
 const simpleChangeWords = {
   // particles
   'o': 'wo',
   'ha': 'wa',
-  // 'e': 'he',
+  'he': 'e',
 };
 
 /** Dictionary of complex changes to apply to raw romaji output from kuroshiro. */
@@ -45,6 +49,8 @@ const complexChangeDic = {
   'toshite mo': 'to shitemo',
   'itsunomanika': 'itsu no mani ka',
   'da kara': 'dakara',
+  'tomoni': 'tomo ni',
+  'yashi': 'ya shi',
   // 'you na': 'youna',
   // 'you ni': 'youni',
 };
@@ -56,17 +62,16 @@ const counters = ['bu', 'dai', 'hai', 'hiki', 'kai', 'mai', 'nin', 'satsu', 'tsu
 const toMerge = [
   'u', 'n',
   'ba', 'sa', 'ta', 'te', 'ze', 'zu',
-  'kou', 'sha', 'tte', 'nai', 'nakute', 'tai', 'kan',
-  'kedo', 'kiri', 'kkiri', 'keshite', 'kata', 'gata',
+  'kou', 'sha', 'tte', 'nai', 'tai', 'kan', 'kiri', 'kkiri', 'kata', 'gata',
   'tara', 'tari', 'teru', 'teki', 'reru',
   'dara', 'dari', 'deru', 'reta', 'rete',
-  'rareru', 'rareta',
+  'rareru', ,
 ];
 
 const hyphenMerge = ['chan', 'sama'];
 
 const postMerge = [
-  'takunai',
+  'takunai', 'takute', 'rareta', 'keshite', 'nakute', 'sete', 'seru', 'senai',
 ];
 
 // If previous word end with value and second word is key, then merge.
@@ -82,6 +87,7 @@ const conditionalPostMerge = {
   'iru': ['te', 'de'],
   'ita': ['te', 'de'],
   'ku': ['te', 'de'],
+  'kedo': 'da',
 };
 
 const interrogative = {
@@ -99,7 +105,7 @@ const interrogative = {
   open: ['shika', 'made', 'no', 'ni', 'goto'],
 };
 
-const split = ["doori"];
+const split = ['doori'];
 
 module.exports = {
   preprocessDic,
@@ -112,5 +118,5 @@ module.exports = {
   postMerge,
   conditionalPostMerge,
   split,
-  interrogative
-}
+  interrogative,
+};

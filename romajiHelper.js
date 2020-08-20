@@ -2,6 +2,7 @@ const wanakana = require('wanakana');
 const Kuroshiro = require('kuroshiro');
 const KuromojiAnalyzer = require('kuroshiro-analyzer-kuromoji');
 const {simpleChangeChars, simpleChangeWords, complexChangeDic, split, toMerge, hyphenMerge, postMerge, conditionalPostMerge, interrogative} = require('./romajiUtils.js');
+const {macroDic} = require('./romajiMacroDic.js');
 
 
 /**
@@ -59,6 +60,7 @@ class RomajiHelper {
   processRomaji(romaji, config) {
     return romaji.split('\n').map((line) => {
       const tempRomaji = this.fixSpacing(this.applyCommonFixes(line));
+      // const tempRomaji = this.fixSpacing(this.applyMacroDic(line));
       return config['capitalizeFirstLetter'] ?
         this.fixCapitalization(tempRomaji) :
         tempRomaji;
@@ -84,8 +86,8 @@ class RomajiHelper {
       const idxFirstApostrophe = fixedSpacing.indexOf('\'');
       const idxSecondApostrophe = fixedSpacing.indexOf('\'', idxFirstApostrophe + 1);
       const fixed = fixedSpacing.substring(idxFirstApostrophe, idxSecondApostrophe + 1)
-        .replace('\' ', '\'')
-        .replace(' \'', '\'');
+          .replace('\' ', '\'')
+          .replace(' \'', '\'');
       finalString += fixedSpacing.substring(0, idxFirstApostrophe) + fixed;
       fixedSpacing = fixedSpacing.substring(idxSecondApostrophe + 1, fixedSpacing.length);
       numApostrophe -= 2;
@@ -167,7 +169,7 @@ class RomajiHelper {
           result[lastResultIndex] += words[i];
           if (postMerge.includes(result[lastResultIndex])) {
             const secondMerge = result.pop();
-            result[lastResultIndex] += secondMerge;
+            result[lastResultIndex-1] += secondMerge;
           }
           continue;
         }
@@ -211,6 +213,19 @@ class RomajiHelper {
       result.push(words[i]);
     }
     return result.join(' ');
+  }
+
+  /** Given a line of romaji, apply common fixes. */
+  applyMacroDic(line) {
+    if (line.match(/\S+/g) == null) {
+      return line;
+    }
+    for (const before in macroDic) {
+      if (line.includes(before)) {
+        line = line.replace(before, macroDic[before]);
+      }
+    }
+    return line;
   }
 }
 
