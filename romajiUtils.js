@@ -51,6 +51,7 @@ const complexChangeDic = {
   'da kara': 'dakara',
   'tomoni': 'tomo ni',
   'yashi': 'ya shi',
+  'mouichido': 'mou ichido',
   // 'you na': 'youna',
   // 'you ni': 'youni',
 };
@@ -81,6 +82,7 @@ const conditionalPostMerge = {
   'nu': 'n',
   'ne': 'n',
   'no': 'n',
+  'da': ['i'],
   'de': ['n', 'i'],
   'desu': 'n',
   'mo': ['te'], // 'de'],

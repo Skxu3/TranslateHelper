@@ -52,7 +52,8 @@ class RomajiHelper {
   preprocessText(rawRomaji) {
     let text = rawRomaji;
     for (const char in simpleChangeChars) {
-      text = text.replace(char, simpleChangeChars[char]);
+      // Replace all
+      text = text.replace(new RegExp(char, 'g'), simpleChangeChars[char]);
     }
     return text;
   }
