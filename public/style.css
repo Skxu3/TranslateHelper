@@ -11,6 +11,7 @@
 textarea{
 	width: 85%;
 	margin: 0 auto;
+	max-width: 100%;
 }
 iframe {
 	width: 80%;
@@ -22,11 +23,9 @@ iframe {
 	white-space: pre-wrap;
 	padding: 2%;
 	display: block;
-	max-height: 250px;
 	overflow-y: scroll;
 	word-wrap: break-word;
 }
-
 
 /** Styling for Text Glossing */
 #textGlossing {
@@ -70,6 +69,10 @@ td {
 	border-left: none;
 	padding: 1%;
 	font-size: 16px;
+}
+
+.panel-selection {
+	margin: 2%;
 }
 
 #quickSearch {
