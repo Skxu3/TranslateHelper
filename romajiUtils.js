@@ -26,8 +26,6 @@ const simpleChangeChars = {
   '』': '"',
   '君': 'kimi',
   '×': 'batsu',
-  // 'って': 'tte',
-  // 'った': 'tta',
 };
 
 const simpleChangeWords = {
@@ -39,11 +37,62 @@ const simpleChangeWords = {
 
 /** Dictionary of complex changes to apply to raw romaji output from kuroshiro. */
 const complexChangeDic = {
+  // counters
   'ichi nin': 'hitori',
-  'ichi kai': 'ikkai',
-  'ichi hai': 'ippai',
+  'ni nin': 'futari',
+
+  'ichi sai': 'issai',
+  'hachi sai': 'hassai',
+  'juu sai': 'juussai',
+  'ni juu sai': 'hatachi',
+
   'ichi hon': 'ippon',
-  'ichi satsu': 'issatsu',
+  'san hon': 'sanbon',
+  'roku hon': 'roppon',
+  'hachi hon': 'happon',
+  'juu hon': 'juuppon',
+  'nan hon': 'nanbon',
+
+  'ichi hai': 'ippai',
+  'san hai': 'sanbai',
+  'roku hai': 'roppai',
+  'hachi hai': 'happai',
+  'juu hai': 'juuppai',
+  'nani hai': 'nanbai',
+
+  'ichi satsu': 'issatsu', // books
+  'juu satsu': 'juussatsu',
+
+  'ichi chaku': 'icchaku', // clothes
+  'juu chaku': 'juucchaku',
+
+  'ichi ko': 'ikko', // small things
+  'roku ko': 'rokko',
+  'hachi ko': 'hakko',
+  'juu ko': 'juukko',
+
+  'ichi kai': 'ikkai',
+  'san kai': 'sangai',
+  'roku kai': 'rokkai',
+  'hachi kai': 'hakkai',
+  'juu kai': 'juukkai',
+  'nan kai': 'nangai', // optional
+
+  // to be further updated
+
+  'ichi kai': 'ikkai',
+  'roku kai': 'rokkai',
+  'hachi kai': 'hakkai',
+  'juu kai': 'juukkai',
+
+  'ichi fun': 'ippun',
+  'san fun': 'sanpun',
+  'yon fun': 'yonpun',
+  'roku fun': 'roppun',
+  'hachi fun': 'happun',
+  'juu fun': 'juuppun',
+  'nanibun': 'nanpun',
+
   'shouga nai': 'shou ganai',
   'shirazu shirazu': 'shirazushirazu',
   'toshite mo': 'to shitemo',
@@ -57,27 +106,28 @@ const complexChangeDic = {
 };
 
 // Wouldn't be by themselves.
-const counters = ['bu', 'dai', 'hai', 'hiki', 'kai', 'mai', 'nin', 'satsu', 'tsu'];
+const counters = ['ji', 'bu', 'fun', 'dai', 'hai', 'hiki', 'kai', 'mai', 'nin', 'chaku', 'satsu', 'tsu'];
 
 /** Dictionary of changes to apply to raw romaji output from kuroshiro. */
 const toMerge = [
   'u', 'n',
   'ba', 'sa', 'ta', 'te', 'ze', 'zu',
-  'kou', 'sha', 'tte', 'nai', 'tai', 'kan', 'kiri', 'kkiri', 'kata', 'gata',
+  'kou', 'sha', 'tte', 'nai', 'tai', 'kan', 'cha',
+  'kiri', 'kkiri', 'kata', 'gata',
   'tara', 'tari', 'teru', 'teki', 'reru',
   'dara', 'dari', 'deru', 'reta', 'rete',
-  'rareru', ,
+  'rareru', 'rete', 'seru',
 ];
 
 const hyphenMerge = ['chan', 'sama'];
 
 const postMerge = [
-  'takunai', 'takute', 'rareta', 'keshite', 'nakute', 'sete', 'seru', 'senai',
+  'takunai', 'takute', 'rareta', 'keshite', 'nakute', 'sete', 'seru', 'senai', 'rete',
 ];
 
 // If previous word end with value and second word is key, then merge.
 const conditionalPostMerge = {
-  'na': 'n',
+  'na': ['n', 'ka'],
   'ni': 'n',
   'nu': 'n',
   'ne': 'n',

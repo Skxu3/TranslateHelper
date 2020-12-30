@@ -143,7 +143,11 @@ class TextGlossingHelper {
         def['definition'] = definition; // definition
 
         translationRow = translationRow.substring(0, idxStartOfPOS);
-        defs.push(def);
+
+        // only add row if word has a definition
+        if (definition != '') {
+          defs.push(def);
+        }
       }
     }
     parts['defs'] = defs.reverse();
